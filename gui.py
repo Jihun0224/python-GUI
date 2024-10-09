@@ -23,9 +23,11 @@ def on_select_bottle():
 def on_submit_command():
     command = command_entry.get("1.0", tk.END).strip()
     messagebox.showinfo("Command Entered", f"You entered command: {command}")
-
+    
     # To Do : LLM
     # To Do : Send Data(To Server)
+
+    command_entry.delete("1.0", tk.END)
     
 # 메인 윈도우
 root = tk.Tk()
