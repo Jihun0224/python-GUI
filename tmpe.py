@@ -30,7 +30,7 @@ class GUI(Node):
 
         # Supervisor control buttons
         self.setup_supervisor_button()
-
+        
         # Task progress variables
         self.llm_response = None
         self.task_list = []
@@ -40,7 +40,8 @@ class GUI(Node):
         self.in_progress_color = "#FF6666"
         self.completed_color = "#A0A0A0"
         self.task_canvas = None
-
+        self.is_recording = False
+        
         # Initialize ROS2 interface
         self.create_interfaces()
         self.start_node_async()
@@ -91,11 +92,20 @@ class GUI(Node):
         self.llm_frame = tk.LabelFrame(self.window, text="", padx=10, pady=10)
         self.llm_frame.pack(pady=20, fill="both")
         tk.Label(self.llm_frame, text="LLM에게 보낼 명령을 입력하세요:", font=("Arial", 16)).pack()
+        
         self.command_entry = tk.Text(self.llm_frame, height=5, width=60, font=("Arial", 14))
         self.command_entry.pack(anchor='center')
-        self.command_submit_button = tk.Button(self.llm_frame, text="보내기", font=("Arial", 16), command=self.on_submit_llm_command)
-        self.command_submit_button.pack(pady=10)
 
+        button_frame = tk.Frame(self.llm_frame)
+        button_frame.pack(pady=10)
+
+        self.command_submit_button = tk.Button(button_frame, text="보내기", font=("Arial", 16), command=self.on_submit_llm_command)
+        self.command_submit_button.pack(side="left", padx=5)
+
+        self.voice_record_button = tk.Button(button_frame, text="음성 녹음", font=("Arial", 16), command=self.voice_recording)
+        self.voice_record_button.pack(side="left", padx=5)
+        
+        
     def setup_llm_response_menu(self):
         tk.Label(self.llm_frame, text="LLM에서 보낸 답변:", font=("Arial", 16)).pack()
         self.response_entry = tk.Text(self.llm_frame, height=5, width=60, font=("Arial", 14))
@@ -110,6 +120,16 @@ class GUI(Node):
         button_frame.grid_columnconfigure(0, weight=1)
         tk.Button(button_frame, text="관리자1", command=self.open_supervisor_window).grid(row=0, column=0, sticky="ew", padx=5)
     
+    def voice_recording(self):
+        self.is_recording = not self.is_recording
+        
+        if self.is_recording:
+            self.voice_record_button.config(text="녹음 중지")
+            print("Recording started...")
+        else:
+            self.voice_record_button.config(text="음성 녹음")
+            print("Recording stopped.")
+            
     def __del__(self):
         self.window.destroy()
         rclpy.shutdown()
@@ -159,7 +179,7 @@ class GUI(Node):
         self.llm_response = None
 
     def function_list_callback(self, msg):
-        self.task_list = msg.data
+        self.task_list = list(msg.data)
         print("-----------------------------")
         print(self.task_list)
         print("-----------------------------")
@@ -300,10 +320,10 @@ class GUI(Node):
         for _ in range(len(self.task_list)):
             if not self.running or not self.task_canvas:
                 break
-            self.root.after(0, self.update_task, False)
+            self.window.after(0, self.update_task, False)
             time.sleep(3) 
 
-            self.root.after(0, self.update_task, True)
+            self.window.after(0, self.update_task, True)
             self.current_task_index += 1
             if self.current_task_index >= len(self.task_list):
                 break
