@@ -1,10 +1,11 @@
 import time
 import rclpy
 import tkinter as tk
+from tkinter import messagebox, ttk
+from ttkthemes import ThemedTk
+from PIL import Image, ImageTk
 from rclpy.node import Node
 from std_msgs.msg import String
-from tkinter import messagebox
-from PIL import Image, ImageTk
 from threading import Thread
 import tasks  # ROS2 communication functions
 
@@ -55,7 +56,11 @@ class GUI(Node):
     def setup_main_window(self):
         self.window = tk.Tk()
         self.window.title("로봇 명령 메뉴")
-
+        
+        # self.window = ThemedTk(theme="itft1")
+        # self.window.title("로봇 명령 메뉴")
+        # self.window.configure(background='#DAEFFD')
+        # ttk.Separator(self.window, orient='horizontal').pack(fill='x', pady=10)
     def setup_bottle_selection(self):
         bottle_images = [
             "/home/sdcrobot/ros2_ws/src/sd_external_msgs/examples/images/blue_bottle.png",
@@ -93,7 +98,7 @@ class GUI(Node):
         self.llm_frame.pack(pady=20, fill="both")
         tk.Label(self.llm_frame, text="LLM에게 보낼 명령을 입력하세요:", font=("Arial", 16)).pack()
         
-        self.command_entry = tk.Text(self.llm_frame, height=5, width=60, font=("Arial", 14))
+        self.command_entry = tk.Text(self.llm_frame, height=5, width=60, font=("Arial", 14), background="white")
         self.command_entry.pack(anchor='center')
 
         button_frame = tk.Frame(self.llm_frame)
@@ -108,7 +113,7 @@ class GUI(Node):
         
     def setup_llm_response_menu(self):
         tk.Label(self.llm_frame, text="LLM에서 보낸 답변:", font=("Arial", 16)).pack()
-        self.response_entry = tk.Text(self.llm_frame, height=5, width=60, font=("Arial", 14))
+        self.response_entry = tk.Text(self.llm_frame, height=5, width=60, font=("Arial", 14), background="white", relief="flat")
         self.response_entry.pack(pady=5)
         self.llm_response_number = 1
         self.response_delete_button = tk.Button(self.llm_frame, text="내용 지우기", font=("Arial", 16), command=self.on_delete_llm_response)
